@@ -6,6 +6,7 @@ import co.istad.elearningapi.api.user.User;
 import co.istad.elearningapi.api.user.UserRepository;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
@@ -18,6 +19,7 @@ public class DataInit {
 
     private final RoleRepository roleRepository;
     private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
 
     @PostConstruct
     void init() {
@@ -33,7 +35,7 @@ public class DataInit {
         User userAdmin = User.builder()
                 .username("admin")
                 .email("admin@istad.co")
-                .password("admin@123")
+                .password(passwordEncoder.encode("admin@123"))
                 .familyName("Chan")
                 .givenName("Chhaya")
                 .gender("Male")
@@ -45,7 +47,7 @@ public class DataInit {
         User userStudent = User.builder()
                 .username("student")
                 .email("student@istad.co")
-                .password("student@123")
+                .password(passwordEncoder.encode("student@123"))
                 .familyName("Jack")
                 .givenName("Dawson")
                 .gender("Male")
@@ -57,7 +59,7 @@ public class DataInit {
         User userInstructor = User.builder()
                 .username("instructor")
                 .email("instructor@istad.co")
-                .password("instructor@123")
+                .password(passwordEncoder.encode("instructor@123"))
                 .familyName("Kit")
                 .givenName("Tara")
                 .gender("Female")

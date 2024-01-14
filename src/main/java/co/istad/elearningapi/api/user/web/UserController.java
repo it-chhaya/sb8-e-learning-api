@@ -8,6 +8,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/users")
@@ -15,6 +16,17 @@ import java.time.LocalDateTime;
 public class UserController {
 
     private final UserService userService;
+
+    @GetMapping
+    BaseSuccess<?> findList() {
+        return BaseSuccess.builder()
+                .data(Map.of("data", "Get success"))
+                .code(HttpStatus.OK.value())
+                .message("User has been found successfully")
+                .status(true)
+                .timestamp(LocalDateTime.now())
+                .build();
+    }
 
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping
