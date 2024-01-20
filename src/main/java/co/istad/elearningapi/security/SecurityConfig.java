@@ -10,6 +10,7 @@ import com.nimbusds.jose.proc.SecurityContext;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.Customizer;
@@ -25,6 +26,8 @@ import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.jwt.JwtEncoder;
 import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.security.oauth2.jwt.NimbusJwtEncoder;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationProvider;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.AuthenticationFilter;
@@ -71,6 +74,20 @@ public class SecurityConfig {
     }
 
     @Bean
+    JwtAuthenticationProvider jwtAuthenticationProvider() {
+        JwtAuthenticationProvider jwtAuthenticationProvider = new JwtAuthenticationProvider(jwtRefreshTokenDecoder());
+        jwtAuthenticationProvider.setJwtAuthenticationConverter(jwtAuthenticationConverter());
+        return jwtAuthenticationProvider;
+    }
+
+    @Bean
+    JwtAuthenticationConverter jwtAuthenticationConverter() {
+        JwtAuthenticationConverter jwtAuthenticationConverter = new JwtAuthenticationConverter();
+        //jwtAuthenticationConverter.setPrincipalClaimName("ISTAD");
+        return jwtAuthenticationConverter;
+    }
+
+    @Bean
     SecurityFilterChain configureFilterChain(
             HttpSecurity httpSecurity) throws Exception {
 
@@ -88,7 +105,8 @@ public class SecurityConfig {
 
         // JWT
         httpSecurity.oauth2ResourceServer(res -> res
-                .jwt(Customizer.withDefaults()));
+                .jwt(jwt -> jwt
+                        .jwtAuthenticationConverter(jwtAuthenticationConverter())));
 
         httpSecurity.sessionManagement(session -> session
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS));
@@ -96,18 +114,42 @@ public class SecurityConfig {
         return httpSecurity.build();
     }
 
-    @Bean
+    @Primary
+    @Bean("jwtAccessTokenDecoder")
     JwtDecoder jwtAccessTokenDecoder() {
         return NimbusJwtDecoder
                 .withPublicKey(keyUtil
                         .getAccessTokenPublicKey()).build();
     }
 
-    @Bean
+    @Bean("jwtRefreshTokenDecoder")
+    JwtDecoder jwtRefreshTokenDecoder() {
+        return NimbusJwtDecoder
+                .withPublicKey(keyUtil
+                        .getRefreshTokenPublicKey()).build();
+    }
+
+    @Primary
+    @Bean("jwtAccessTokenEncoder")
     JwtEncoder jwtAccessTokenEncoder() {
 
         RSAKey rsaKey = new RSAKey.Builder(keyUtil.getAccessTokenPublicKey())
                 .privateKey(keyUtil.getAccessTokenPrivateKey())
+                .keyID(UUID.randomUUID().toString())
+                .build();
+
+        JWKSet jwkSet = new JWKSet(rsaKey);
+        JWKSource<SecurityContext> jwkSource = (jwkSelector, context)
+                -> jwkSelector.select(jwkSet);
+
+        return new NimbusJwtEncoder(jwkSource);
+    }
+
+    @Bean("jwtRefreshTokenEncoder")
+    JwtEncoder jwtRefreshTokenEncoder() {
+
+        RSAKey rsaKey = new RSAKey.Builder(keyUtil.getRefreshTokenPublicKey())
+                .privateKey(keyUtil.getRefreshTokenPrivateKey())
                 .keyID(UUID.randomUUID().toString())
                 .build();
 
@@ -127,6 +169,5 @@ public class SecurityConfig {
         source.registerCorsConfiguration("/**", configuration);
         return source;
     }*/
-
 
 }

@@ -21,11 +21,16 @@ public class KeyUtil {
 
     @Value("${keys.access-private-token}")
     private String accessPrivateTokenPath;
-
     @Value("${keys.access-public-token}")
     private String accessPublicTokenPath;
 
+    @Value("${keys.refresh-private-token}")
+    private String refreshPrivateTokenPath;
+    @Value("${keys.refresh-public-token}")
+    private String refreshPublicTokenPath;
+
     private KeyPair accessTokenKeyPair;
+    private KeyPair refreshTokenKeyPair;
 
     public KeyPair getAccessTokenKeyPair() {
 
@@ -34,6 +39,15 @@ public class KeyUtil {
         }
 
         return accessTokenKeyPair;
+    }
+
+    public KeyPair getRefreshTokenKeyPair() {
+
+        if (Objects.isNull(refreshTokenKeyPair)) {
+            refreshTokenKeyPair = this.getKeyPair(refreshPublicTokenPath, refreshPrivateTokenPath);
+        }
+
+        return refreshTokenKeyPair;
     }
 
     private KeyPair getKeyPair(String publicKeyPath, String privateKeyPath) {
@@ -101,6 +115,14 @@ public class KeyUtil {
 
     public RSAPrivateKey getAccessTokenPrivateKey() {
         return (RSAPrivateKey) getAccessTokenKeyPair().getPrivate();
+    }
+
+    public RSAPublicKey getRefreshTokenPublicKey() {
+        return (RSAPublicKey) getRefreshTokenKeyPair().getPublic();
+    }
+
+    public RSAPrivateKey getRefreshTokenPrivateKey() {
+        return (RSAPrivateKey) getRefreshTokenKeyPair().getPrivate();
     }
 
 }
