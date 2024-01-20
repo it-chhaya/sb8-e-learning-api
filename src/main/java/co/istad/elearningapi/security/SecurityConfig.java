@@ -82,9 +82,8 @@ public class SecurityConfig {
 
     @Bean
     JwtAuthenticationConverter jwtAuthenticationConverter() {
-        JwtAuthenticationConverter jwtAuthenticationConverter = new JwtAuthenticationConverter();
         //jwtAuthenticationConverter.setPrincipalClaimName("ISTAD");
-        return jwtAuthenticationConverter;
+        return new JwtAuthenticationConverter();
     }
 
     @Bean
