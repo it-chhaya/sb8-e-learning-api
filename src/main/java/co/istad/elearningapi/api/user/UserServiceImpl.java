@@ -33,13 +33,11 @@ public class UserServiceImpl implements UserService {
 
         SecurityContext context = SecurityContextHolder.getContext();
         Authentication auth = context.getAuthentication();
-
         Jwt jwt = (Jwt) auth.getPrincipal();
 
-        log.info("auth: {}", jwt.getClaimAsString("authorities"));
+        /*log.info("auth: {}", jwt.getClaimAsString("authorities"));
         log.info("auth: {}", jwt.getTokenValue());
-        log.info("auth: {}", jwt.getId());
-
+        log.info("auth: {}", jwt.getId());*/
         User user = userRepository.findByUsernameAndIsDeleted(jwt.getId(), false)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
                         "User has not been found"));

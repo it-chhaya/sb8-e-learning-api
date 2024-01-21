@@ -97,7 +97,11 @@ public class SecurityConfig {
             HttpSecurity httpSecurity) throws Exception {
 
         httpSecurity.authorizeHttpRequests(auth -> auth
-                .requestMatchers("/api/users/**").hasAuthority("CSTAD_ADMIN")
+                .requestMatchers("/api/users/**")
+                .hasAnyAuthority("CSTAD_user:read",
+                        "CSTAD_user:write",
+                        "CSTAD_user:delete",
+                        "CSTAD_user:update")
                 .requestMatchers("/api/auth/**").permitAll()
                 .anyRequest().authenticated());
 

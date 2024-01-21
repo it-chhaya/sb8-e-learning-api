@@ -95,7 +95,7 @@ public class AuthServiceImpl implements AuthService {
                 .claim("authorities", authorities)
                 .subject("Access Token")
                 .audience(List.of("iOS", "Android"))
-                .expiresAt(now.plus(1, ChronoUnit.MINUTES))
+                .expiresAt(now.plus(1, ChronoUnit.HOURS))
                 .build();
 
         return jwtAccessTokenEncoder.encode(
@@ -111,7 +111,7 @@ public class AuthServiceImpl implements AuthService {
                 .id(auth.getName())
                 .issuer(auth.getName())
                 .issuedAt(now)
-                //.claim("istad", scope)
+                //.claim("authorities", scope)
                 .expiresAt(now.plus(30, ChronoUnit.DAYS))
                 .subject("Refresh Token")
                 .audience(List.of("iOS", "Android"))
