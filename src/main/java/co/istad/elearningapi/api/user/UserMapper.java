@@ -1,5 +1,6 @@
 package co.istad.elearningapi.api.user;
 
+import co.istad.elearningapi.api.auth.RegisterDto;
 import co.istad.elearningapi.api.user.web.UserCreationDto;
 import co.istad.elearningapi.api.user.web.UserDto;
 import co.istad.elearningapi.api.user.web.UserEditionDto;
@@ -18,5 +19,7 @@ public interface UserMapper {
                             UserEditionDto userEditionDto);
 
     UserDto toUserDto(User user);
+
+    UserCreationDto mapRegisterDtoToUserCreationDto(RegisterDto registerDto);
 
 }

@@ -1,10 +1,16 @@
 package co.istad.elearningapi.api.auth;
 
+import co.istad.elearningapi.api.user.UserMapper;
+import co.istad.elearningapi.api.user.UserRepository;
+import co.istad.elearningapi.api.user.UserService;
+import co.istad.elearningapi.api.user.web.UserCreationDto;
 import co.istad.elearningapi.security.CustomUserDetails;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.http.HttpStatus;
+import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.core.Authentication;
@@ -17,17 +23,23 @@ import org.springframework.security.oauth2.jwt.JwtEncoderParameters;
 import org.springframework.security.oauth2.server.resource.authentication.BearerTokenAuthenticationToken;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationProvider;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.time.Duration;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 @Slf4j
 public class AuthServiceImpl implements AuthService {
+
+    private final UserService userService;
+    private final UserMapper userMapper;
+    private final JavaMailSender javaMailSender;
 
     private final DaoAuthenticationProvider daoAuthProvider;
     private final JwtAuthenticationProvider jwtAuthProvider;
@@ -120,6 +132,19 @@ public class AuthServiceImpl implements AuthService {
         return jwtRefreshTokenEncoder.encode(
                 JwtEncoderParameters.from(jwtClaimsSet)
         ).getTokenValue();
+    }
+
+
+    @Override
+    public void register(RegisterDto registerDto) {
+
+        if (!registerDto.password().equals(registerDto.passwordConfirmation())) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                    "Password is not match!");
+        }
+
+        UserCreationDto userCreationDto = userMapper.mapRegisterDtoToUserCreationDto(registerDto);
+        userService.createNew(userCreationDto);
     }
 
 }

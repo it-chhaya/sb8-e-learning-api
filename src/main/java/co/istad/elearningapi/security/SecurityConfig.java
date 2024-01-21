@@ -12,8 +12,10 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.Customizer;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -42,6 +44,7 @@ import java.util.UUID;
 
 @Configuration
 @EnableWebSecurity
+@EnableMethodSecurity
 @RequiredArgsConstructor
 public class SecurityConfig {
 
@@ -96,14 +99,13 @@ public class SecurityConfig {
     SecurityFilterChain configureFilterChain(
             HttpSecurity httpSecurity) throws Exception {
 
-        httpSecurity.authorizeHttpRequests(auth -> auth
-                .requestMatchers("/api/users/**")
-                .hasAnyAuthority("CSTAD_user:read",
-                        "CSTAD_user:write",
-                        "CSTAD_user:delete",
-                        "CSTAD_user:update")
+        /*httpSecurity.authorizeHttpRequests(auth -> auth
+                .requestMatchers(HttpMethod.GET, "/api/users/**").hasAuthority("CSTAD_user:read")
+                .requestMatchers(HttpMethod.POST, "/api/users/**").hasAuthority("CSTAD_user:write")
+                .requestMatchers(HttpMethod.DELETE, "/api/users/**").hasAuthority("CSTAD_user:delete")
+                .requestMatchers(HttpMethod.PUT, "/api/users/**").hasAuthority("CSTAD_user:update")
                 .requestMatchers("/api/auth/**").permitAll()
-                .anyRequest().authenticated());
+                .anyRequest().authenticated());*/
 
         httpSecurity.formLogin(AbstractHttpConfigurer::disable);
         httpSecurity.csrf(AbstractHttpConfigurer::disable);

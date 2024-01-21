@@ -5,6 +5,7 @@ import co.istad.elearningapi.api.category.CategoryRepository;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -33,12 +34,14 @@ public class CategoryController {
                 .orElseThrow();
     }
 
+    @PreAuthorize("hasAuthority('CSTAD_elearning:delete')")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @DeleteMapping("/{id}")
     void deleteById(@PathVariable Integer id) {
         categoryRepository.deleteById(id);
     }
 
+    @PreAuthorize("hasAuthority('CSTAD_elearning:write')")
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping
     void createNew(@RequestBody @Valid CategoryCreationDto creationDto) {
@@ -50,6 +53,7 @@ public class CategoryController {
         categoryRepository.save(category);
     }
 
+    @PreAuthorize("hasAuthority('CSTAD_elearning:update')")
     @PutMapping("/{id}")
     Category editById(@PathVariable Integer id,
                       @Valid @RequestBody CategoryCreationDto creationDto) {

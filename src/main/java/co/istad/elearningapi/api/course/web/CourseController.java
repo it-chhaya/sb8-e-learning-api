@@ -10,6 +10,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
@@ -22,6 +23,7 @@ public class CourseController {
     private final CourseRepository courseRepository;
     private final CourseMapper courseMapper;
 
+    @PreAuthorize("hasAuthority('CSTAD_elearning:write')")
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping
     void createNew(@Valid @RequestBody CourseCreationDto creationDto) {

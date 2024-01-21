@@ -40,4 +40,15 @@ public class AuthController {
                 .build();
     }
 
+    @PostMapping("/register")
+    BaseSuccess<?> register(@Valid @RequestBody RegisterDto registerDto) {
+        authService.register(registerDto);
+        return BaseSuccess.builder()
+                .code(HttpStatus.OK.value())
+                .message("You have been registered successfully, please check email confirmation")
+                .status(true)
+                .timestamp(LocalDateTime.now())
+                .build();
+    }
+
 }
