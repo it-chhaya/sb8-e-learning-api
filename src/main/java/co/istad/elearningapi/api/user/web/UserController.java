@@ -17,6 +17,17 @@ public class UserController {
 
     private final UserService userService;
 
+    @GetMapping("/me")
+    BaseSuccess<?> findMe() {
+        return BaseSuccess.builder()
+                .data(userService.findMe())
+                .code(HttpStatus.OK.value())
+                .message("User profile has been found successfully")
+                .status(true)
+                .timestamp(LocalDateTime.now())
+                .build();
+    }
+
     @GetMapping
     BaseSuccess<?> findList() {
         return BaseSuccess.builder()

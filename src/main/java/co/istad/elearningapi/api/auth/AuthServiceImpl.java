@@ -75,7 +75,7 @@ public class AuthServiceImpl implements AuthService {
         return AuthDto.builder()
                 .tokenType("Bearer")
                 .accessToken(this.createAccessToken(auth))
-                .refreshToken(this.createRefreshToken(auth))
+                .refreshToken(refreshToken)
                 .build();
     }
 
@@ -83,7 +83,7 @@ public class AuthServiceImpl implements AuthService {
 
         Instant now = Instant.now();
 
-        String scope = auth.getAuthorities()
+        String authorities = auth.getAuthorities()
                 .stream()
                 .map(GrantedAuthority::getAuthority)
                 .collect(Collectors.joining(" "));
@@ -92,7 +92,7 @@ public class AuthServiceImpl implements AuthService {
                 .id(auth.getName())
                 .issuer(auth.getName())
                 .issuedAt(now)
-                .claim("scope", scope)
+                .claim("authorities", authorities)
                 .subject("Access Token")
                 .audience(List.of("iOS", "Android"))
                 .expiresAt(now.plus(1, ChronoUnit.MINUTES))
@@ -111,7 +111,7 @@ public class AuthServiceImpl implements AuthService {
                 .id(auth.getName())
                 .issuer(auth.getName())
                 .issuedAt(now)
-                //.claim("scope", scope)
+                //.claim("istad", scope)
                 .expiresAt(now.plus(30, ChronoUnit.DAYS))
                 .subject("Refresh Token")
                 .audience(List.of("iOS", "Android"))

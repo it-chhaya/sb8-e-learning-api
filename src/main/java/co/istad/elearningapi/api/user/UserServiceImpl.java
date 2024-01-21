@@ -4,8 +4,13 @@ import co.istad.elearningapi.api.user.web.UserCreationDto;
 import co.istad.elearningapi.api.user.web.UserDto;
 import co.istad.elearningapi.api.user.web.UserEditionDto;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
@@ -16,11 +21,39 @@ import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
     private final UserMapper userMapper;
     private final RoleRepository roleRepository;
+
+    @Override
+    public UserDto findMe() {
+
+        SecurityContext context = SecurityContextHolder.getContext();
+        Authentication auth = context.getAuthentication();
+
+        Jwt jwt = (Jwt) auth.getPrincipal();
+
+        log.info("auth: {}", jwt.getClaimAsString("authorities"));
+        log.info("auth: {}", jwt.getTokenValue());
+        log.info("auth: {}", jwt.getId());
+
+        User user = userRepository.findByUsernameAndIsDeleted(jwt.getId(), false)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
+                        "User has not been found"));
+
+        return UserDto.builder()
+                .id(user.getId())
+                .familyName(user.getFamilyName())
+                .givenName(user.getGivenName())
+                .gender(user.getGender())
+                .dob(user.getDob())
+                .biography(user.getBiography())
+                .authorities(jwt.getClaimAsStringList("authorities"))
+                .build();
+    }
 
     @Override
     public void createNew(UserCreationDto creationDto) {

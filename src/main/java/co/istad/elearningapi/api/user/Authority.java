@@ -11,17 +11,15 @@ import java.util.List;
 @AllArgsConstructor
 @Builder
 @Entity
-@Table(name = "roles")
-public class Role {
+@Table(name = "authorities")
+public class Authority {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
     private String name;
 
-    @ManyToMany(mappedBy = "roles", fetch = FetchType.EAGER)
-    private List<User> users;
-
-    @ManyToMany(fetch = FetchType.EAGER)
-    private List<Authority> authorities;
+    @ManyToMany(mappedBy = "authorities", fetch = FetchType.EAGER)
+    private List<Role> roles;
 
 }

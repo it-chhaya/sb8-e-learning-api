@@ -1,11 +1,16 @@
 package co.istad.elearningapi.api.user.web;
 
-import java.time.LocalDate;
+import lombok.Builder;
 
+import java.time.LocalDate;
+import java.util.List;
+
+@Builder
 public record UserDto(Long id,
                       String familyName,
                       String givenName,
                       String gender,
                       LocalDate dob,
-                      String biography) {
+                      String biography,
+                      List<String> authorities) {
 }

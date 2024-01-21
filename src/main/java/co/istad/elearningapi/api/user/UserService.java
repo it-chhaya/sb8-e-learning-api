@@ -7,6 +7,8 @@ import org.springframework.data.domain.Page;
 
 public interface UserService {
 
+    UserDto findMe();
+
     // Create new user:
     // Return type is DTO:
     // Request data is DTO:
