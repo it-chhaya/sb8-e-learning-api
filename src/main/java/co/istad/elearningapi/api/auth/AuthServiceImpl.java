@@ -103,22 +103,17 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public void verifyUser(String email, String verifiedCode) {
-
         // Check user email
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
                         "User has not been found!"));
 
         if (!Objects.equals(user.getVerifiedCode(), verifiedCode)) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
-                    "Verified code doesn't match!");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Verified code doesn't match!");
         }
-
         LocalDateTime now = LocalDateTime.now();
-
         if (now.isAfter(user.getVerifiedExpiration())) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
-                    "Verified code expired!");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Verified code expired!");
         }
 
         user.setIsVerified(true);
