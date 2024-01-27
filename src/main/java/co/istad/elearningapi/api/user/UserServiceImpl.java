@@ -40,7 +40,7 @@ public class UserServiceImpl implements UserService {
         /*log.info("auth: {}", jwt.getClaimAsString("authorities"));
         log.info("auth: {}", jwt.getTokenValue());
         log.info("auth: {}", jwt.getId());*/
-        User user = userRepository.findByUsernameAndIsDeleted(jwt.getId(), false)
+        User user = userRepository.findByUsernameAndIsDeletedAndIsVerified(jwt.getId(), false, true)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
                         "User has not been found"));
 

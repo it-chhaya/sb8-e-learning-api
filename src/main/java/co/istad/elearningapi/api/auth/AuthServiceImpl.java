@@ -1,16 +1,22 @@
 package co.istad.elearningapi.api.auth;
 
+import co.istad.elearningapi.api.user.User;
 import co.istad.elearningapi.api.user.UserMapper;
 import co.istad.elearningapi.api.user.UserRepository;
 import co.istad.elearningapi.api.user.UserService;
 import co.istad.elearningapi.api.user.web.UserCreationDto;
 import co.istad.elearningapi.security.CustomUserDetails;
+import co.istad.elearningapi.util.RandomUtil;
+import jakarta.mail.MessagingException;
+import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.core.Authentication;
@@ -24,9 +30,12 @@ import org.springframework.security.oauth2.server.resource.authentication.Bearer
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationProvider;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
+import org.thymeleaf.TemplateEngine;
+import org.thymeleaf.context.Context;
 
 import java.time.Duration;
 import java.time.Instant;
+import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Map;
@@ -37,19 +46,60 @@ import java.util.stream.Collectors;
 @Slf4j
 public class AuthServiceImpl implements AuthService {
 
+    private final UserRepository userRepository;
     private final UserService userService;
     private final UserMapper userMapper;
     private final JavaMailSender javaMailSender;
+    private final TemplateEngine templateEngine;
 
     private final DaoAuthenticationProvider daoAuthProvider;
     private final JwtAuthenticationProvider jwtAuthProvider;
     private final JwtEncoder jwtAccessTokenEncoder;
     private JwtEncoder jwtRefreshTokenEncoder;
 
+    @Value("${spring.mail.username}")
+    private String adminMail;
+
     @Autowired
     @Qualifier("jwtRefreshTokenEncoder")
     public void setJwtRefreshTokenEncoder(JwtEncoder jwtRefreshTokenEncoder) {
         this.jwtRefreshTokenEncoder = jwtRefreshTokenEncoder;
+    }
+
+    @Override
+    public void verifyBySendMail(String email) {
+
+        // Check user email
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
+                        "User has not been found!"));
+
+        // Prepare verification data into db
+        String digits = RandomUtil.random6Digits();
+        LocalDateTime verifiedExpiration = LocalDateTime.now().plusMinutes(30);
+
+        user.setVerifiedCode(digits);
+        user.setVerifiedExpiration(verifiedExpiration);
+        userRepository.save(user);
+
+        MimeMessage message = javaMailSender.createMimeMessage();
+        MimeMessageHelper helper = new MimeMessageHelper(message);
+        Context context = new Context();
+        context.setVariable("user", user);
+
+        try {
+            String template = templateEngine.process("verify-email", context);
+            helper.setFrom(adminMail);
+            helper.setTo(email);
+            helper.setSubject("Account Verification");
+            helper.setText(template, true);
+            javaMailSender.send(helper.getMimeMessage());
+        } catch (MessagingException e) {
+            throw new RuntimeException(e);
+        }
+
+
+
     }
 
     @Override

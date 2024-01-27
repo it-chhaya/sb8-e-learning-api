@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Set;
 
 @Getter
@@ -30,6 +31,9 @@ public class User {
     @Column(columnDefinition = "TEXT")
     private String biography;
     private Boolean isDeleted;
+    private Boolean isVerified;
+    private String verifiedCode;
+    private LocalDateTime verifiedExpiration;
 
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "users_roles",

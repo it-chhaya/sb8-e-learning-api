@@ -11,6 +11,7 @@ public interface AuthService {
     void register(RegisterDto registerDto);
 
     // verify
+    void verifyBySendMail(String email);
 
     // reset password
 }

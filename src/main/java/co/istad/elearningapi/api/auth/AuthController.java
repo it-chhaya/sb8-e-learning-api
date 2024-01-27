@@ -18,6 +18,18 @@ public class AuthController {
 
     private final AuthService authService;
 
+    @PostMapping("/verify-mail")
+    BaseSuccess<?> verifyMail(@Valid @RequestBody VerifyMailDto verifyMailDto) {
+        authService.verifyBySendMail(verifyMailDto.email());
+        return BaseSuccess.builder()
+                .data(verifyMailDto.email())
+                .code(HttpStatus.OK.value())
+                .message("Please check email to verify")
+                .status(true)
+                .timestamp(LocalDateTime.now())
+                .build();
+    }
+
     @PostMapping("/refresh-token")
     BaseSuccess<?> refreshToken(@Valid @RequestBody RefreshTokenDto refreshTokenDto) {
         return BaseSuccess.builder()
