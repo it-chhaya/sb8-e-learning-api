@@ -18,6 +18,18 @@ public class AuthController {
 
     private final AuthService authService;
 
+    @PostMapping("/verify-user")
+    BaseSuccess<?> verifyUser(@Valid @RequestBody VerifyUserDto verifyUserDto) {
+        authService.verifyUser(verifyUserDto.email(), verifyUserDto.verifiedCode());
+        return BaseSuccess.builder()
+                .data("http://localhost:3000/")
+                .code(HttpStatus.OK.value())
+                .message("User has been verified successfully")
+                .status(true)
+                .timestamp(LocalDateTime.now())
+                .build();
+    }
+
     @PostMapping("/verify-mail")
     BaseSuccess<?> verifyMail(@Valid @RequestBody VerifyMailDto verifyMailDto) {
         authService.verifyBySendMail(verifyMailDto.email());

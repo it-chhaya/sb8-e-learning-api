@@ -12,6 +12,7 @@ public interface AuthService {
 
     // verify
     void verifyBySendMail(String email);
+    void verifyUser(String email, String verifiedCode);
 
     // reset password
 }

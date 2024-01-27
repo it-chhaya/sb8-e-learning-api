@@ -39,6 +39,7 @@ import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Service
@@ -88,7 +89,8 @@ public class AuthServiceImpl implements AuthService {
         context.setVariable("user", user);
 
         try {
-            String template = templateEngine.process("verify-email", context);
+            String template = templateEngine.process("verify-email",
+                    context);
             helper.setFrom(adminMail);
             helper.setTo(email);
             helper.setSubject("Account Verification");
@@ -97,9 +99,32 @@ public class AuthServiceImpl implements AuthService {
         } catch (MessagingException e) {
             throw new RuntimeException(e);
         }
+    }
 
+    @Override
+    public void verifyUser(String email, String verifiedCode) {
 
+        // Check user email
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
+                        "User has not been found!"));
 
+        if (!Objects.equals(user.getVerifiedCode(), verifiedCode)) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                    "Verified code doesn't match!");
+        }
+
+        LocalDateTime now = LocalDateTime.now();
+
+        if (now.isAfter(user.getVerifiedExpiration())) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                    "Verified code expired!");
+        }
+
+        user.setIsVerified(true);
+        user.setVerifiedCode(null);
+        user.setVerifiedExpiration(null);
+        userRepository.save(user);
     }
 
     @Override
