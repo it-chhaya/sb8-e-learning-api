@@ -35,7 +35,6 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserDto editProfile(String profile) {
-
         SecurityContext context = SecurityContextHolder.getContext();
         Authentication auth = context.getAuthentication();
         Jwt jwt = (Jwt) auth.getPrincipal();
@@ -47,8 +46,9 @@ public class UserServiceImpl implements UserService {
         user.setProfile(profile);
         userRepository.save(user);
 
-        List<String> authorities = List.of(jwt.getClaimAsString("authorities").split(" "));
-
+        List<String> authorities = List.of(
+                jwt.getClaimAsString("authorities").split(" ")
+        );
         return userMapper.toUserDto(user, authorities);
     }
 

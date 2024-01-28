@@ -21,8 +21,9 @@ public class UserController {
     @PreAuthorize("hasAuthority('CSTAD_user:update')")
     @PutMapping("/me/profile")
     BaseSuccess<?> editProfile(@RequestBody ProfileDto profileDto) {
+        UserDto userDto = userService.editProfile(profileDto.profile());
         return BaseSuccess.builder()
-                .data(userService.editProfile(profileDto.profile()))
+                .data(userDto)
                 .code(HttpStatus.OK.value())
                 .message("User profile has been edited successfully")
                 .status(true)
