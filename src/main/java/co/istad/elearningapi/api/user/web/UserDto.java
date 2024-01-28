@@ -9,6 +9,7 @@ import java.util.List;
 public record UserDto(Long id,
                       String familyName,
                       String givenName,
+                      String profile,
                       String gender,
                       LocalDate dob,
                       String biography,

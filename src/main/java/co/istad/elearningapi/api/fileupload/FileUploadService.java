@@ -2,8 +2,8 @@ package co.istad.elearningapi.api.fileupload;
 
 import org.springframework.web.multipart.MultipartFile;
 
-public interface FileService {
+public interface FileUploadService {
 
-    void uploadSingle(MultipartFile file);
+    FileUploadDto uploadSingle(MultipartFile file);
 
 }

@@ -7,6 +7,8 @@ import org.springframework.data.domain.Page;
 
 public interface UserService {
 
+    UserDto editProfile(String profile);
+
     UserDto findMe();
 
     // Create new user:

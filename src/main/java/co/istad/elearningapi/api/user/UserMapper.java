@@ -4,10 +4,9 @@ import co.istad.elearningapi.api.auth.RegisterDto;
 import co.istad.elearningapi.api.user.web.UserCreationDto;
 import co.istad.elearningapi.api.user.web.UserDto;
 import co.istad.elearningapi.api.user.web.UserEditionDto;
-import org.mapstruct.BeanMapping;
-import org.mapstruct.Mapper;
-import org.mapstruct.MappingTarget;
-import org.mapstruct.NullValuePropertyMappingStrategy;
+import org.mapstruct.*;
+
+import java.util.List;
 
 @Mapper(componentModel = "spring")
 public interface UserMapper {
@@ -18,7 +17,8 @@ public interface UserMapper {
     void fromUserEditionDto(@MappingTarget User user,
                             UserEditionDto userEditionDto);
 
-    UserDto toUserDto(User user);
+    @Mapping(source = "authorities", target = "authorities")
+    UserDto toUserDto(User user, List<String> authorities);
 
     UserCreationDto mapRegisterDtoToUserCreationDto(RegisterDto registerDto);
 

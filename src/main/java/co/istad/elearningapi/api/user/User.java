@@ -26,6 +26,7 @@ public class User {
     private String password;
     private String familyName;
     private String givenName;
+    private String profile;
     private String gender;
     private LocalDate dob;
     @Column(columnDefinition = "TEXT")

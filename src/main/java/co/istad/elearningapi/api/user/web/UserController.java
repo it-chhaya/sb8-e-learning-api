@@ -18,6 +18,18 @@ public class UserController {
 
     private final UserService userService;
 
+    @PreAuthorize("hasAuthority('CSTAD_user:update')")
+    @PutMapping("/me/profile")
+    BaseSuccess<?> editProfile(@RequestBody ProfileDto profileDto) {
+        return BaseSuccess.builder()
+                .data(userService.editProfile(profileDto.profile()))
+                .code(HttpStatus.OK.value())
+                .message("User profile has been edited successfully")
+                .status(true)
+                .timestamp(LocalDateTime.now())
+                .build();
+    }
+
     @PreAuthorize("hasAuthority('CSTAD_user:read')")
     @GetMapping("/me")
     BaseSuccess<?> findMe() {
