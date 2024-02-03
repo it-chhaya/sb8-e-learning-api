@@ -21,7 +21,7 @@ public class DataInit {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
 
-    //@PostConstruct
+    @PostConstruct
     void init() {
 
         // Insert role: ADMIN, USER, STUDENT, INSTRUCTOR
