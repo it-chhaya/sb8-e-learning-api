@@ -2,8 +2,10 @@ package co.istad.elearningapi.api.course;
 
 import co.istad.elearningapi.api.course.web.CourseCreationDto;
 import co.istad.elearningapi.api.course.web.CourseDto;
+import co.istad.elearningapi.api.course.web.CourseEditionDto;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import org.mapstruct.MappingTarget;
 
 import java.util.List;
 
@@ -20,5 +22,7 @@ public interface CourseMapper {
     @Mapping(source = "categoryId", target = "category.id")
     Course mapCreationDtoToCourse(CourseCreationDto creationDto);
 
+    void mapEditionDtoToCourse(CourseEditionDto courseEditionDto,
+                               @MappingTarget Course course);
 
 }

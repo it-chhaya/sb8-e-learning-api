@@ -24,6 +24,20 @@ public class CourseController {
 
     private final CourseService courseService;
 
+    @PreAuthorize("hasAuthority('CSTAD_elearning:delete')")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @DeleteMapping("/{id}")
+    void deleteById(@PathVariable Long id) {
+        courseService.deleteById(id);
+    }
+
+    @PreAuthorize("hasAuthority('CSTAD_elearning:update')")
+    @PutMapping("/{id}")
+    void editById(@PathVariable Long id,
+                  @Valid @RequestBody CourseEditionDto courseEditionDto) {
+        courseService.editById(id, courseEditionDto);
+    }
+
     @GetMapping("/{id}")
     BaseSuccess<?> findById(@PathVariable Long id) {
         return BaseSuccess.builder()
