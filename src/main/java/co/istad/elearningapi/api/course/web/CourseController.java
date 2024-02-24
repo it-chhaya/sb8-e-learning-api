@@ -3,6 +3,8 @@ package co.istad.elearningapi.api.course.web;
 import co.istad.elearningapi.api.course.Course;
 import co.istad.elearningapi.api.course.CourseMapper;
 import co.istad.elearningapi.api.course.CourseRepository;
+import co.istad.elearningapi.api.course.CourseService;
+import co.istad.elearningapi.base.BaseSuccess;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -20,27 +22,30 @@ import java.time.LocalDateTime;
 @RequiredArgsConstructor
 public class CourseController {
 
-    private final CourseRepository courseRepository;
-    private final CourseMapper courseMapper;
+    private final CourseService courseService;
+
+    @GetMapping("/{id}")
+    BaseSuccess<?> findById(@PathVariable Long id) {
+        return BaseSuccess.builder()
+                .code(HttpStatus.OK.value())
+                .status(true)
+                .timestamp(LocalDateTime.now())
+                .message("Course has been found successfully")
+                .data(courseService.findById(id))
+                .build();
+    }
 
     @PreAuthorize("hasAuthority('CSTAD_elearning:write')")
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping
     void createNew(@Valid @RequestBody CourseCreationDto creationDto) {
-        Course course = courseMapper.mapCreationDtoToCourse(creationDto);
-        course.setCreatedAt(LocalDateTime.now());
-        course.setIsDelete(false);
-        course.setUpdatedAt(null);
-        courseRepository.save(course);
+        courseService.createNew(creationDto);
     }
 
     @GetMapping
     Page<CourseDto> findList(@RequestParam(required = false, defaultValue = "0") int pageNumber,
                              @RequestParam(required = false, defaultValue = "4") int pageSize) {
-        Sort sortById = Sort.by(Sort.Direction.DESC, "id");
-        Pageable pageable = PageRequest.of(pageNumber, pageSize, sortById);
-        Page<Course> courses = courseRepository.findAll(pageable);
-        return courses.map(courseMapper::mapCourseToCourseDto);
+        return courseService.findList(pageNumber, pageSize);
     }
 
 }
